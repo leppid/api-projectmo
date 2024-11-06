@@ -1,8 +1,73 @@
-# Omakase Ruby styling for Rails
-inherit_gem: { rubocop-rails-omakase: rubocop.yml }
-
-# Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+AllCops:
+  TargetRubyVersion: 2.7
+  Exclude:
+    - "db/**/*"
+    - "bin/**/*"
+    - "log/**/*"
+    - "Gemfile"
+    - "app/mailers/**/*"
+    - "spec/spec_helper.rb"
+    - "app/admin/**/*"
+    - "config/**/*"
+    - "app.rb"
+    - "vendor/**/*"
+Metrics/LineLength:
+  Enabled: false
+Metrics/BlockLength:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/MutableConstant:
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: false
+Style/GuardClause:
+  Enabled: false
+Style/WordArray:
+  Enabled: false
+Style/Lambda:
+  Enabled: false
+Style/RedundantSelf:
+  Enabled: false
+Style/HashSyntax:
+  Enabled: false
+Naming/VariableNumber:
+  Enabled: false
+Style/CommentAnnotation:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Enabled: false
+Style/BlockDelimiters:
+  Enabled: true
+  EnforcedStyle: braces_for_chaining
+  SupportedStyles:
+    - line_count_based
+    - braces_for_chaining
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Layout/SpaceAroundEqualsInParameterDefault:
+  Enabled: false
+Layout/Style/SingleLineMethods:
+  Enabled: false
+Style/RescueStandardError:
+  Enabled: false
+Metrics/MethodLength:
+  Max: 25
+Layout/FirstHashElementIndentation:
+  Enabled: false
+Style/TrailingCommaInHashLiteral:
+  Enabled: false
+Naming/PredicateName:
+  Enabled: false
+Style/NumericPredicate:
+  Enabled: false
+Lint/RescueException:
+  Enabled: false
+Metrics/ClassLength:
+  Max: 130
+Metrics/ModuleLength:
+  Max: 130

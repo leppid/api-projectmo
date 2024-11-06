@@ -15,15 +15,15 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  username: <%= ENV["PROJECTMO3D_DATABASE_USERNAME"] %>
-  password: <%= ENV["PROJECTMO3D_DATABASE_PASSWORD"] %>
+  username: <%= ENV["PROJECTMO_DATABASE_USERNAME"] %>
+  password: <%= ENV["PROJECTMO_DATABASE_PASSWORD"] %>
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 development:
   <<: *default
-  database: projectmo3d_development
+  database: projectmo_development
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
@@ -57,7 +57,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: projectmo3d_test
+  database: projectmo_test
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -82,18 +82,18 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: projectmo3d_production
-    username: projectmo3d
+    database: projectmo_production
+    username: projectmo
     password: <%= ENV["PROJECTMO3D_DATABASE_PASSWORD"] %>
   cache:
     <<: *primary_production
-    database: projectmo3d_production_cache
+    database: projectmo_production_cache
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: projectmo3d_production_queue
+    database: projectmo_production_queue
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: projectmo3d_production_cable
+    database: projectmo_production_cable
     migrations_paths: db/cable_migrate
