@@ -1,5 +1,5 @@
 class SessionController < ApplicationController
-  expose :player, -> { Player.find_by(login: params[:login]) }
+  expose :player, -> { Player.find_by(login: params[:login].strip) }
 
   skip_before_action :authenticate_user!, only: [:create]
 
