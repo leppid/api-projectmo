@@ -1,0 +1,2 @@
+class WeaponsPlayer < ApplicationRecord
+end

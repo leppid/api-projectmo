@@ -1,25 +1,25 @@
 class ApplicationController < ActionController::Base
-  protect_from_forgery with: :null_session
+  protect_from_forgery
 
-  before_action :authenticate_user!
+  before_action :authenticate_player
 
-  def current_user
+  def current_player
     return if decoded_auth_token.blank?
 
     return if token_expired?
 
-    @current_user ||= Player.find(decoded_auth_token['player_id'])
+    @current_player ||= Player.find(decoded_auth_token['player_id'])
   end
 
-  def encode_auth_token(user)
-    JWT.encode({ player_id: user.id, expire: 1.month.from_now }.to_json, ENV['JWT_SECRET'])
+  def authenticate_player
+    render json: { message: 'Not Authorized' }, status: :unauthorized unless current_player
+  end
+
+  def encode_auth_token(player)
+    JWT.encode({ player_id: player.id, expire: 1.month.from_now }.to_json, ENV['JWT_SECRET'])
   end
 
   private
-
-  def authenticate_user!
-    render json: { message: 'Not Authorized' }, status: :unauthorized unless current_user
-  end
 
   def decoded_auth_token
     header = request.headers['Authorization']

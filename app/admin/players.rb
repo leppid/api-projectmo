@@ -4,6 +4,7 @@ ActiveAdmin.register Player do
   index do
     selectable_column
     id_column
+    column :display_name
     column :login
     column :location
     column :position

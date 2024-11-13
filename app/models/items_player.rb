@@ -1,0 +1,2 @@
+class ItemsPlayer < ApplicationRecord
+end

@@ -10,11 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_11_12_002304) do
+ActiveRecord::Schema[8.0].define(version: 2024_11_13_013923) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pgcrypto"
 
-  create_table "active_admin_comments", force: :cascade do |t|
+  create_table "active_admin_comments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "namespace"
     t.text "body"
     t.string "resource_type"
@@ -28,7 +29,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_12_002304) do
     t.index ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource"
   end
 
-  create_table "admin_users", force: :cascade do |t|
+  create_table "admin_users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
@@ -40,12 +41,54 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_12_002304) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
-  create_table "players", force: :cascade do |t|
-    t.string "login"
-    t.string "password_digest"
+  create_table "armors", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "position"
+    t.string "type"
+    t.string "name"
+  end
+
+  create_table "items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "type"
+    t.string "name"
+  end
+
+  create_table "players", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "display_name"
+    t.string "login"
+    t.string "password_digest"
     t.string "location"
+    t.string "position"
+    t.uuid "helmet_id"
+    t.uuid "bip_id"
+    t.uuid "pants_id"
+    t.uuid "primary_id"
+    t.uuid "secondary_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "players_armors", id: false, force: :cascade do |t|
+    t.uuid "player_id", null: false
+    t.uuid "armor_id", null: false
+  end
+
+  create_table "players_items", id: false, force: :cascade do |t|
+    t.uuid "player_id", null: false
+    t.uuid "item_id", null: false
+  end
+
+  create_table "players_weapons", id: false, force: :cascade do |t|
+    t.uuid "player_id", null: false
+    t.uuid "weapon_id", null: false
+  end
+
+  create_table "weapons", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "type"
+    t.string "name"
   end
 end

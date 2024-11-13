@@ -44,7 +44,7 @@ gem "thruster", require: false
 # 
 
 gem "sassc-rails"
-gem "active_model_serializers"
+gem 'blueprinter'
 gem 'decent_exposure', '~> 3.0'
 
 gem "rubocop"
