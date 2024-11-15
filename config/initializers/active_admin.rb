@@ -7,6 +7,8 @@ ActiveAdmin.setup do |config|
   config.site_title = "Projectmo"
 
   config.skip_before_action :authenticate_player
+  
+  config.authentication_method = :authenticate_admin_user!
 
   # Set the link url for the title. For example, to take
   # users to your main site. Defaults to no link.
@@ -73,7 +75,6 @@ ActiveAdmin.setup do |config|
   #
   # This setting changes the method which Active Admin calls
   # within the application controller.
-  config.authentication_method = :authenticate_admin_user!
 
   # == User Authorization
   #
@@ -136,7 +137,7 @@ ActiveAdmin.setup do |config|
   # roots for each namespace.
   #
   # Default:
-  # config.root_to = 'dashboard#index'
+  config.root_to = 'admins#index'
 
   # == Admin Comments
   #

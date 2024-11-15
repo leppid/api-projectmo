@@ -44,14 +44,14 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_13_013923) do
   create_table "armors", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "type"
+    t.string "type", default: "Armor::Base"
     t.string "name"
   end
 
   create_table "items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "type"
+    t.string "type", default: "Item::Base"
     t.string "name"
   end
 
@@ -61,26 +61,32 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_13_013923) do
     t.string "password_digest"
     t.string "location"
     t.string "position"
-    t.uuid "helmet_id"
-    t.uuid "bip_id"
-    t.uuid "pants_id"
+    t.uuid "head_id"
+    t.uuid "body_id"
+    t.uuid "legs_id"
     t.uuid "primary_id"
     t.uuid "secondary_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "players_armors", id: false, force: :cascade do |t|
+  create_table "players_armors", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.uuid "player_id", null: false
     t.uuid "armor_id", null: false
   end
 
-  create_table "players_items", id: false, force: :cascade do |t|
+  create_table "players_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.uuid "player_id", null: false
     t.uuid "item_id", null: false
   end
 
-  create_table "players_weapons", id: false, force: :cascade do |t|
+  create_table "players_weapons", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.uuid "player_id", null: false
     t.uuid "weapon_id", null: false
   end
@@ -88,7 +94,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_13_013923) do
   create_table "weapons", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "type"
+    t.string "type", default: "Weapon::Base"
     t.string "name"
   end
 end

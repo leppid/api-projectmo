@@ -1,2 +1,0 @@
-class ArmorsPlayer < ApplicationRecord
-end

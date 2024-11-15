@@ -6,9 +6,9 @@ class CreatePlayers < ActiveRecord::Migration[8.0]
       t.string :password_digest
       t.string :location
       t.string :position
-      t.uuid :helmet_id
-      t.uuid :bip_id
-      t.uuid :pants_id
+      t.uuid :head_id
+      t.uuid :body_id
+      t.uuid :legs_id
       t.uuid :primary_id
       t.uuid :secondary_id
       t.timestamps

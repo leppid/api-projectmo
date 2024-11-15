@@ -1,6 +1,7 @@
 class CreateJoinTableItemsPlayers < ActiveRecord::Migration[8.0]
   def change
-    create_table :players_items, id: false do |t|
+    create_table :players_items, id: :uuid do |t|
+      t.timestamps
       t.uuid "player_id", null: false
       t.uuid "item_id", null: false
     end
