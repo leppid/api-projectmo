@@ -9,7 +9,7 @@ class SessionController < ApplicationController
 
   def create
     if player&.authenticate(params[:password])
-      render json: PlayerBlueprint.render(player).merge(token: encode_auth_token(player)), status: :ok
+      render json: PlayerBlueprint.render_as_json(player).merge(token: encode_auth_token(player)), status: :ok
     else
       render json: { message: 'Invalid Login or Password' }, status: :unauthorized
     end
