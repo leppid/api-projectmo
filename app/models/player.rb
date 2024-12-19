@@ -1,25 +1,25 @@
 class Player < ApplicationRecord
   has_secure_password
 
-  has_and_belongs_to_many :armors, join_table: 'players_armors', association_foreign_key: :armor_id, class_name: 'Armor::Base', dependent: :destroy
+  has_many :armors, class_name: 'Player::Armor::Base', dependent: :destroy
 
-  has_and_belongs_to_many :head_armors, join_table: :players_armors, association_foreign_key: :armor_id, class_name: 'Armor::Head'
-  has_and_belongs_to_many :body_armors, join_table: :players_armors, association_foreign_key: :armor_id, class_name: 'Armor::Body'
-  has_and_belongs_to_many :legs_armors, join_table: :players_armors, association_foreign_key: :armor_id, class_name: 'Armor::Legs'
+  has_many :head_armors, class_name: 'Player::Armor::Head'
+  has_many :body_armors, class_name: 'Player::Armor::Body'
+  has_many :legs_armors, class_name: 'Player::Armor::Legs'
 
-  has_and_belongs_to_many :weapons, join_table: :players_weapons, association_foreign_key: :weapon_id, class_name: 'Weapon::Base', dependent: :destroy
+  has_many :weapons, class_name: 'Player::Weapon::Base', dependent: :destroy
 
-  has_and_belongs_to_many :primary_weapons, join_table: :players_weapons, association_foreign_key: :weapon_id, class_name: 'Weapon::Primary'
-  has_and_belongs_to_many :secondary_weapons, join_table: :players_weapons, association_foreign_key: :weapon_id, class_name: 'Weapon::Secondary'
+  has_many :primary_weapons, class_name: 'Player::Weapon::Primary'
+  has_many :secondary_weapons, class_name: 'Player::Weapon::Secondary'
 
-  has_and_belongs_to_many :items, join_table: :players_items, association_foreign_key: :item_id, class_name: 'Item::Base', dependent: :destroy
+  has_many :items, class_name: 'Player::Item::Base', dependent: :destroy
 
-  belongs_to :head, class_name: 'Armor::Head', optional: true
-  belongs_to :body, class_name: 'Armor::Body', optional: true
-  belongs_to :legs, class_name: 'Armor::Legs', optional: true
+  belongs_to :head_armor, class_name: 'Player::Armor::Head', optional: true
+  belongs_to :body_armor, class_name: 'Player::Armor::Body', optional: true
+  belongs_to :legs_armor, class_name: 'Player::Armor::Legs', optional: true
 
-  belongs_to :primary, class_name: 'Weapon::Primary', optional: true
-  belongs_to :secondary, class_name: 'Weapon::Secondary', optional: true
+  belongs_to :primary_weapon, class_name: 'Player::Weapon::Primary', optional: true
+  belongs_to :secondary_weapon, class_name: 'Player::Weapon::Secondary', optional: true
 
   before_create :set_initial_data
 

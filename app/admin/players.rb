@@ -23,44 +23,49 @@ ActiveAdmin.register Player, as: "Players" do
       end
     end
 
-    panel "Equipment" do
+    panel "Armor" do
       attributes_table_for(resource) do
         row :head do |obj|
-          model = obj.head
+          model = obj.head_armor
           if (model)
-            link_to "#{model.name} [#{model.type} #{model.id}]", admin_armor_path(model.id)
+            link_to "#{model.name} [#{model.type} #{model.id}]", admin_player_armor_path(model.id)
           else
             "Empty"
           end
         end
         row :body do |obj|
-          model = obj.body
+          model = obj.body_armor
           if (model)
-            link_to "#{model.name} [#{model.type} #{model.id}]", admin_armor_path(model.id)
+            link_to "#{model.name} [#{model.type} #{model.id}]", admin_player_armor_path(model.id)
           else
             "Empty"
           end
         end
         row :legs do |obj|
-          model = obj.legs
+          model = obj.legs_armor
           if (model)
-            link_to "#{model.name} [#{model.type} #{model.id}]", admin_armor_path(model.id)
+            link_to "#{model.name} [#{model.type} #{model.id}]", admin_player_armor_path(model.id)
           else
             "Empty"
           end
         end
+      end
+    end
+
+    panel "Weapon" do
+      attributes_table_for(resource) do
         row :primary do |obj|
-          model = obj.primary
+          model = obj.primary_weapon
           if (model)
-            link_to "#{model.name} [#{model.type} #{model.id}]", admin_weapon_path(model.id)
+            link_to "#{model.name} [#{model.type} #{model.id}]", admin_player_weapon_path(model.id)
           else
             "Empty"
           end
         end
         row :secondary do |obj|
-          model = obj.secondary
+          model = obj.secondary_weapon
           if (model)
-            link_to "#{model.name} [#{model.type} #{model.id}]", admin_weapon_path(model.id)
+            link_to "#{model.name} [#{model.type} #{model.id}]", admin_player_weapon_path(model.id)
           else
             "Empty"
           end
