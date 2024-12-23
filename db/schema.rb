@@ -41,49 +41,57 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_13_013762) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
+  create_table "draft_armors", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "type", default: "Draft::Armor::Base"
+    t.string "name"
+  end
+
+  create_table "draft_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "type", default: "Draft::Item::Base"
+    t.string "name"
+    t.string "description"
+  end
+
+  create_table "draft_weapons", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "type", default: "Draft::Weapon::Base"
+    t.string "name"
+  end
+
   create_table "game_armors", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "type", default: "Game::Armor::Base"
-    t.string "name"
+    t.uuid "draft_armor_id"
+    t.uuid "player_id"
+    t.uuid "head_slot_id"
+    t.uuid "body_slot_id"
+    t.uuid "legs_slot_id"
   end
 
   create_table "game_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "type", default: "Gmae::Item::Base"
-    t.string "name"
+    t.string "type", default: "Game::Item::Base"
+    t.uuid "draft_item_id"
+    t.uuid "player_id"
+    t.uuid "primary_slot_id"
+    t.uuid "secondary_slot_id"
   end
 
   create_table "game_weapons", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "type", default: "Game::Weapon::Base"
-    t.string "name"
-  end
-
-  create_table "player_armors", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "type", default: "Player::Armor::Base"
-    t.uuid "game_armor_id"
+    t.uuid "draft_weapon_id"
     t.uuid "player_id"
-  end
-
-  create_table "player_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "type", default: "Player::Item::Base"
-    t.uuid "game_item_id"
-    t.uuid "player_id"
-  end
-
-  create_table "player_weapons", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "type", default: "Player::Weapon::Base"
-    t.uuid "game_weapon_id"
-    t.uuid "player_id"
+    t.uuid "primary_slot_id"
+    t.uuid "secondary_slot_id"
   end
 
   create_table "players", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -92,11 +100,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_13_013762) do
     t.string "password_digest"
     t.string "location"
     t.string "position"
-    t.uuid "head_armor_id"
-    t.uuid "body_armor_id"
-    t.uuid "legs_armor_id"
-    t.uuid "primary_weapon_id"
-    t.uuid "secondary_weapon_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
