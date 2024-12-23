@@ -10,6 +10,8 @@ ActiveAdmin.register Player, as: "Players" do
     column :login
     column :location
     column :position
+    column :created_at
+    column :updated_at
     actions
   end
 
@@ -20,13 +22,15 @@ ActiveAdmin.register Player, as: "Players" do
         row :login
         row :location
         row :position
+        row :created_at
+        row :updated_at
       end
     end
 
     panel "Armor" do
       attributes_table_for(resource) do
         row :head do |obj|
-          model = obj.head_slot
+          model = obj.head_armor
           if (model)
             link_to "#{model.name} [#{model.type} #{model.id}]", admin_game_armor_path(model.id)
           else
@@ -34,7 +38,7 @@ ActiveAdmin.register Player, as: "Players" do
           end
         end
         row :body do |obj|
-          model = obj.body_slot
+          model = obj.body_armor
           if (model)
             link_to "#{model.name} [#{model.type} #{model.id}]", admin_game_armor_path(model.id)
           else
@@ -42,7 +46,7 @@ ActiveAdmin.register Player, as: "Players" do
           end
         end
         row :legs do |obj|
-          model = obj.legs_slot
+          model = obj.legs_armor
           if (model)
             link_to "#{model.name} [#{model.type} #{model.id}]", admin_game_armor_path(model.id)
           else
@@ -55,7 +59,7 @@ ActiveAdmin.register Player, as: "Players" do
     panel "Weapon" do
       attributes_table_for(resource) do
         row :primary do |obj|
-          model = obj.primary_slot
+          model = obj.primary_weapon
           if (model)
             link_to "#{model.name} [#{model.type} #{model.id}]", admin_game_weapon_path(model.id)
           else
@@ -63,7 +67,7 @@ ActiveAdmin.register Player, as: "Players" do
           end
         end
         row :secondary do |obj|
-          model = obj.secondary_slot
+          model = obj.secondary_weapon
           if (model)
             link_to "#{model.name} [#{model.type} #{model.id}]", admin_game_weapon_path(model.id)
           else

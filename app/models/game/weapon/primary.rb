@@ -1,11 +1,11 @@
 class Game::Weapon::Primary < Game::Weapon::Base
-  belongs_to :primary_slot, class_name: 'Player', optional: true
+  has_one :primary_slot, class_name: 'Player', foreign_key: 'primary_weapon_id'
 
   def equip
-    update_columns(primary_slot_id: player_id, player_id: nil)
+    player.update_column(:primary_weapon_id, id)
   end
 
   def unequip
-    update_columns(primary_slot_id: nil, player_id: primary_slot_id)
+    player&.update_column(:primary_weapon_id, nil)
   end
 end

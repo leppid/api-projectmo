@@ -38,8 +38,8 @@ ActiveAdmin.register Game::Weapon::Base, as: "Game Weapons" do
     selectable_column
     id_column
     column :player_id do |obj|
-      if obj.owner
-        link_to "#{obj.owner.login}", admin_player_path(obj.owner.id)
+      if obj.player_id
+        link_to "#{obj.player.login}", admin_player_path(obj.player_id)
       else
         "Empty"
       end
@@ -49,6 +49,8 @@ ActiveAdmin.register Game::Weapon::Base, as: "Game Weapons" do
     end
     column :type
     column :equiped?
+    column :created_at
+    column :updated_at
     column :actions do |obj|
       links = []
       links << link_to('Equip', equip_admin_game_weapon_path(obj, index: true), method: :put) if !obj.equiped?
@@ -62,8 +64,8 @@ ActiveAdmin.register Game::Weapon::Base, as: "Game Weapons" do
   show do
     attributes_table_for(resource) do
       row :player_id do |obj|
-        if obj.owner
-          link_to "#{obj.owner.login}", admin_player_path(obj.owner.id)
+        if obj.player_id
+          link_to "#{obj.player.login}", admin_player_path(obj.player_id)
         else
           "Empty"
         end
@@ -73,6 +75,8 @@ ActiveAdmin.register Game::Weapon::Base, as: "Game Weapons" do
       end
       row :type
       row :equiped?
+      row :created_at
+      row :updated_at
     end
   end
 

@@ -1,12 +1,14 @@
 class Player < ApplicationRecord
   has_secure_password
 
-  has_one :head_slot, class_name: 'Game::Armor::Head', foreign_key: :head_slot_id
-  has_one :body_slot, class_name: 'Game::Armor::Body', foreign_key: :body_slot_id
-  has_one :legs_slot, class_name: 'Game::Armor::Legs', foreign_key: :legs_slot_id
+  belongs_to :head_armor, class_name: 'Game::Armor::Head', optional: true, dependent: :destroy
+  belongs_to :body_armor, class_name: 'Game::Armor::Body', optional: true, dependent: :destroy
+  belongs_to :legs_armor, class_name: 'Game::Armor::Legs', optional: true, dependent: :destroy
 
-  has_one :primary_slot, class_name: 'Game::Weapon::Primary', foreign_key: :primary_slot_id
-  has_one :secondary_slot, class_name: 'Game::Weapon::Secondary', foreign_key: :secondary_slot_id
+  belongs_to :primary_weapon, class_name: 'Game::Weapon::Primary', optional: true, dependent: :destroy
+  belongs_to :secondary_weapon, class_name: 'Game::Weapon::Secondary', optional: true, dependent: :destroy
+
+  has_one :inventory_grid, class_name: 'Inventory::Grid', dependent: :destroy
 
   has_many :armors, class_name: 'Game::Armor::Base', dependent: :destroy
 
@@ -21,12 +23,18 @@ class Player < ApplicationRecord
 
   has_many :items, class_name: 'Game::Item::Base', dependent: :destroy
 
+  validates :login, presence: true, uniqueness: true
+
   before_create :set_initial_data
 
-  validates :login, presence: true, uniqueness: true
+  after_create :create_inventory_grid
 
   def self.cc
     find_by(login: 'playercc') || create(login: 'playercc', password: 'password')
+  end
+
+  def first_empty_slot
+    inventory_grid.first_empty_slot
   end
 
   private

@@ -4,14 +4,15 @@ class Game::Armor::Base < ApplicationRecord
   self.table_name = 'game_armors'
 
   belongs_to :draft_armor, class_name: 'Draft::Armor::Base'
+  belongs_to :player, class_name: 'Player', optional: true
 
-  belongs_to :player, optional: true
+  has_one :slot, as: :slotable, class_name: 'Inventory::Slot'
 
-  before_save :set_parent_type
+  validate :slot_availablity, on: :create
 
-  def owner
-    Player.find_by(id: player_id || head_slot_id || body_slot_id || legs_slot_id)
-  end
+  before_create :set_parent_type, :assing_slot_callback
+
+  before_destroy :clear_slot
 
   def name
     draft_armor.name
@@ -20,14 +21,42 @@ class Game::Armor::Base < ApplicationRecord
   def equiped?
     case type
     when TYPES[0]
-      head_slot_id.present?
+      player&.head_armor_id == id
     when TYPES[1]
-      body_slot_id.present?
+      player&.body_armor_id == id
     when TYPES[2]
-      legs_slot_id.present?
+      player&.legs_armor_id == id
     else
       false
     end
+  end
+
+  def slot_availablity
+    return errors.add(:base, 'Player not found') if player.nil?
+
+    errors.add(:base, 'No available slots') if player.first_empty_slot.nil?
+  end
+
+  def assing_slot_callback
+    return if player.nil?
+
+    first_empty_slot = player.first_empty_slot
+
+    return if first_empty_slot.nil?
+
+    self.slot = first_empty_slot
+  end
+
+  def assign_slot
+    assing_slot_callback
+
+    save(validate: false)
+  end
+
+  def clear_slot
+    self.slot = nil
+
+    save(validate: false)
   end
 
   private

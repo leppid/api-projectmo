@@ -12,8 +12,8 @@ ActiveAdmin.register Game::Item::Base, as: "Game Items" do
     selectable_column
     id_column
     column :player_id do |obj|
-      if obj.owner
-        link_to "#{obj.owner.login}", admin_player_path(obj.owner.id)
+      if obj.player_id
+        link_to "#{obj.player.login}", admin_player_path(obj.player_id)
       else
         "Empty"
       end
@@ -22,14 +22,16 @@ ActiveAdmin.register Game::Item::Base, as: "Game Items" do
       link_to "#{obj.draft_item.name} [#{obj.draft_item.type}]", admin_draft_item_path(obj.draft_item_id)
     end
     column :type
+    column :created_at
+    column :updated_at
     actions
   end
 
   show do
     attributes_table_for(resource) do
       row :player_id do |obj|
-        if obj.owner
-          link_to "#{obj.owner.login}", admin_player_path(obj.owner.id)
+        if obj.player_id
+          link_to "#{obj.player.login}", admin_player_path(obj.player_id)
         else
           "Empty"
         end
@@ -38,6 +40,8 @@ ActiveAdmin.register Game::Item::Base, as: "Game Items" do
         link_to "#{obj.draft_item.name} [#{obj.draft_item.type}]", admin_draft_item_path(obj.draft_item_id)
       end
       row :type
+      row :created_at
+      row :updated_at
     end
   end
 

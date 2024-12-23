@@ -15,6 +15,8 @@ ActiveAdmin.register Draft::Item::Base, as: "Draft Items" do
     column :count_exists do |obj|
       link_to "#{Game::Item::Base.where(draft_item_id: obj.id).count} units", admin_game_items_path(q: { draft_item_id_eq: obj.id })
     end
+    column :created_at
+    column :updated_at
     actions
   end
 
@@ -25,6 +27,8 @@ ActiveAdmin.register Draft::Item::Base, as: "Draft Items" do
       row :count_exists do |obj|
         link_to "#{Game::Item::Base.where(draft_item_id: obj.id).count} units", admin_game_items_path(q: { draft_item_id_eq: obj.id })
       end
+      row :created_at
+      row :updated_at
     end
   end
 

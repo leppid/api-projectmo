@@ -1,11 +1,15 @@
 class Game::Armor::Body < Game::Armor::Base
-  belongs_to :body_slot, class_name: 'Player', optional: true
+  has_one :body_slot, class_name: 'Player', foreign_key: 'body_armor_id'
 
   def equip
-    update_columns(body_slot_id: player_id, player_id: nil)
+    clear_slot
+
+    player&.update_column(:body_armor_id, id)
   end
 
   def unequip
-    update_columns(body_slot_id: nil, player_id: body_slot_id)
+    return unless assign_slot
+
+    player&.update_column(:body_armor_id, nil)
   end
 end
