@@ -49,6 +49,7 @@ ActiveAdmin.register Game::Armor::Base, as: "Game Armors" do
     end
     column :type
     column :equiped?
+    column :index
     column :created_at
     column :updated_at
     column :actions do |obj|
@@ -75,6 +76,7 @@ ActiveAdmin.register Game::Armor::Base, as: "Game Armors" do
       end
       row :type
       row :equiped?
+      row :index
       row :created_at
       row :updated_at
     end

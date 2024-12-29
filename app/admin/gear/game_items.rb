@@ -22,6 +22,7 @@ ActiveAdmin.register Game::Item::Base, as: "Game Items" do
       link_to "#{obj.draft_item.name} [#{obj.draft_item.type}]", admin_draft_item_path(obj.draft_item_id)
     end
     column :type
+    column :index
     column :created_at
     column :updated_at
     actions
@@ -40,6 +41,7 @@ ActiveAdmin.register Game::Item::Base, as: "Game Items" do
         link_to "#{obj.draft_item.name} [#{obj.draft_item.type}]", admin_draft_item_path(obj.draft_item_id)
       end
       row :type
+      row :index
       row :created_at
       row :updated_at
     end
