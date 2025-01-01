@@ -1,7 +1,7 @@
 class PlayerController < ApplicationController
   expose :player, -> { current_player }
 
-  def update
+  def sync_position
     player.update(player_params)
 
     return render json: PlayerBlueprint.render(player), status: :ok unless player.errors.any?
@@ -12,6 +12,6 @@ class PlayerController < ApplicationController
   private
 
   def player_params
-    params.require(:player).permit(:login, :location, :position)
+    params.permit(:login, :location, :position)
   end
 end

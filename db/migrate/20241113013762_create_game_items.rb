@@ -5,6 +5,7 @@ class CreateGameItems < ActiveRecord::Migration[8.0]
       t.string :type, default: "Game::Item::Base"
       t.uuid :draft_item_id
       t.uuid :player_id
+      t.uuid :slot_id
     end
   end
 end

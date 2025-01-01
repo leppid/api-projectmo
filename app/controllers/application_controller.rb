@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
+  wrap_parameters false
+
   before_action :authenticate_player
 
   def current_player

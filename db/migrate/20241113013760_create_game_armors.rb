@@ -5,6 +5,7 @@ class CreateGameArmors < ActiveRecord::Migration[8.0]
       t.string :type, default: "Game::Armor::Base"
       t.uuid :draft_armor_id
       t.uuid :player_id
+      t.uuid :slot_id
     end
   end
 end
