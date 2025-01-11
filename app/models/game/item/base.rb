@@ -9,6 +9,10 @@ class Game::Item::Base < ApplicationRecord
 
   before_create :set_parent_type
 
+  def index
+    slot&.index
+  end
+
   def name
     draft_item.name
   end

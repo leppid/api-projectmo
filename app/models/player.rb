@@ -31,7 +31,7 @@ class Player < ApplicationRecord
   after_create :create_equip_slots, :create_bag_slots
 
   def stuff
-    armors << weapons << items
+    armors + weapons + items
   end
 
   def empty_bag_slot

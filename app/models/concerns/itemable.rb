@@ -4,8 +4,6 @@ module Itemable
   included do
     belongs_to :player
     belongs_to :slot, class_name: 'Slot::Base', optional: true
-
-    before_validation :assign_bag_slot, on: :create
   end
 
   def set_bag_slot

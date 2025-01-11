@@ -8,10 +8,10 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   resources :session, only: [:index, :create]
+  
   get "player", to: "player#index"
-  post "sync_position", to: "player#sync_position"
-  get "inventory", to: "inventory#index"
-  post "sync_inventory", to: "inventory#sync_inventory"
+  get "player/inventory", to: "player#inventory"
+  post "player/sync", to: "player#sync"
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
