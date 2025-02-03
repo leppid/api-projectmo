@@ -7,11 +7,11 @@ class Player < ApplicationRecord
   has_one :primary_slot, class_name: 'Slot::Primary'
   has_one :secondary_slot, class_name: 'Slot::Secondary'
 
-  delegate :head_armor, to: :head_slot
-  delegate :body_armor, to: :body_slot
-  delegate :legs_armor, to: :legs_slot
-  delegate :primary_weapon, to: :primary_slot
-  delegate :secondary_weapon, to: :secondary_slot
+  delegate :head_armor, to: :head_slot, allow_nil: true
+  delegate :body_armor, to: :body_slot, allow_nil: true
+  delegate :legs_armor, to: :legs_slot, allow_nil: true
+  delegate :primary_weapon, to: :primary_slot, allow_nil: true
+  delegate :secondary_weapon, to: :secondary_slot, allow_nil: true
 
   has_many :bag_slots, class_name: 'Slot::Bag', dependent: :destroy
   has_many :slots, class_name: 'Slot::Base', dependent: :destroy
@@ -53,6 +53,14 @@ class Player < ApplicationRecord
     find_by(login: 'playercc') || create(login: 'playercc', password: 'password')
   end
 
+  def create_equip_slots
+    create_head_slot
+    create_body_slot
+    create_legs_slot
+    create_primary_slot
+    create_secondary_slot
+  end
+
   private
 
   def set_initial_data
@@ -60,14 +68,6 @@ class Player < ApplicationRecord
     self.login = self.login.downcase
     self.location = ENV['PLAYER_INITIAL_LOCATION']
     self.position = ENV['PLAYER_INITIAL_POSITION']
-  end
-
-  def create_equip_slots
-    create_head_slot
-    create_body_slot
-    create_legs_slot
-    create_primary_slot
-    create_secondary_slot
   end
 
   def create_bag_slots

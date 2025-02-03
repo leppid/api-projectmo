@@ -4,6 +4,7 @@ class CreateDraftArmors < ActiveRecord::Migration[8.0]
       t.timestamps
       t.string :type, default: "Draft::Armor::Base"
       t.string :name
+      t.string :model
     end
   end
 end

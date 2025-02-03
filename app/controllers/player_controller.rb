@@ -8,6 +8,7 @@ class PlayerController < ApplicationController
   end
 
   def inventory
+    stuff_without_slot.each(&:set_bag_slot)
     render json: InventoryBlueprint.render(stuff), status: :ok
   end
 
@@ -27,23 +28,25 @@ class PlayerController < ApplicationController
   end
 
   def sync_inventory
+    stuff_without_slot.each(&:set_bag_slot)
+
     return if player_params[:inventory].blank?
 
     player_params[:inventory].each do |inv_item|
       item = player.stuff.select { |i| i.id == inv_item[:id] }.first
       slot = player.slots.find_by(index: inv_item[:index])
 
+      puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ #{item.blank?} #{slot.blank?}"
+
       next if item.blank? || slot.blank?
 
       item.update(slot: slot)
     end
 
-    stuff_without_slot.each(&:set_bag_slot)
-
     head :ok
   end
 
   def player_params
-    params.permit(:location, :position, inventory: %i[id name type index])
+    params.permit(:location, :position, inventory: %i[id name type index model color])
   end
 end

@@ -9,6 +9,10 @@ class Game::Weapon::Base < ApplicationRecord
 
   before_create :set_parent_type
 
+  def model
+    draft_weapon.model.downcase
+  end
+
   def index
     slot&.index
   end

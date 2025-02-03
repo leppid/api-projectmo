@@ -84,7 +84,7 @@ production:
     <<: *default
     database: projectmo_production
     username: projectmo
-    password: <%= ENV["PROJECTMO3D_DATABASE_PASSWORD"] %>
+    password: <%= ENV["PROJECTMO_DATABASE_PASSWORD"] %>
   cache:
     <<: *primary_production
     database: projectmo_production_cache
