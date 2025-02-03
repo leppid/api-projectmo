@@ -36,8 +36,6 @@ class PlayerController < ApplicationController
       item = player.stuff.select { |i| i.id == inv_item[:id] }.first
       slot = player.slots.find_by(index: inv_item[:index])
 
-      puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ #{item.blank?} #{slot.blank?}"
-
       next if item.blank? || slot.blank?
 
       item.update(slot: slot)

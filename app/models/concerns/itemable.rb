@@ -14,7 +14,7 @@ module Itemable
   def assign_bag_slot
     empty_bag_slot = player&.empty_bag_slot
 
-    return errors.add(:player, 'Bag is full') unless empty_bag_slot
+    return p "Player #{player.id} has no empty bag slot" unless empty_bag_slot
 
     self.slot = empty_bag_slot
   end

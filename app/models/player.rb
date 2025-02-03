@@ -28,7 +28,7 @@ class Player < ApplicationRecord
 
   before_create :set_initial_data
 
-  after_create :create_equip_slots, :create_bag_slots
+  after_create :create_equip_slots, :create_bag_slots, :create_bag_page
 
   def stuff
     armors + weapons + items
@@ -46,6 +46,7 @@ class Player < ApplicationRecord
   def remove_bag_page
     return if bag_pages < 2
 
+    remove_bag_slots
     update_column(:bag_pages, bag_pages - 1)
   end
 
@@ -66,13 +67,19 @@ class Player < ApplicationRecord
   def set_initial_data
     self.display_name = self.login
     self.login = self.login.downcase
-    self.location = ENV['PLAYER_INITIAL_LOCATION']
-    self.position = ENV['PLAYER_INITIAL_POSITION']
+    self.location = ENV['MO_INITIAL_LOCATION']
+    self.position = ENV['MO_INITIAL_POSITION']
   end
 
   def create_bag_slots
     12.times do
       bag_slots.create
+    end
+  end
+
+  def remove_bag_slots
+    12.times do
+      bag_slots.order(:index).last.destroy
     end
   end
 end

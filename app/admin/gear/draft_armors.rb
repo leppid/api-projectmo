@@ -1,11 +1,19 @@
 ActiveAdmin.register Draft::Armor::Base, as: 'Draft Armors' do
   menu priority: 2
 
-  permit_params :name, :model, :type
+  permit_params :name, :model, :type, :player_id
 
   filter :id
   filter :name
   filter :type, as: :select, collection: Draft::Armor::Base::TYPES
+
+  controller do
+    def spawn_for
+      return unless params[:player_id]
+      resource.spawn_for(params[:player_id])
+      redirect_to admin_draft_armor_edit_path(resource.id), notice: 'Generated!'
+    end
+  end
 
   index do
     selectable_column
@@ -39,6 +47,7 @@ ActiveAdmin.register Draft::Armor::Base, as: 'Draft Armors' do
       f.input :name
       f.input :model
       f.input :type, as: :select, collection: Draft::Armor::Base::TYPES, include_blank: false
+      f.input :player_id, label: "Spawn for", as: :select, collection: Player.all.map { |p| ["#{p.login} [#{p.id}]", p.id] }
     end
     f.actions
   end

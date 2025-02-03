@@ -15,6 +15,24 @@ ActiveAdmin.register Player, as: "Players" do
     actions
   end
 
+  member_action :create_bag_page_action, method: %i[put] do
+    resource.create_bag_page
+    redirect_to admin_player_path(resource.id), notice: 'Bag page created!'
+  end
+
+  member_action :remove_bag_page_action, method: %i[put] do
+    resource.remove_bag_page
+    redirect_to admin_player_path(resource.id), notice: 'Bag page removed!'
+  end
+
+  action_item :create_bag_page, only: :show, priority: 0 do
+    link_to "Create Bag Page", create_bag_page_action_admin_player_path(resource), method: :put 
+  end
+
+  action_item :remove_bag_page, only: :show, priority: 0, if: proc { resource.bag_pages > 1 } do 
+    link_to "Remove Bag Page", remove_bag_page_action_admin_player_path(resource), method: :put
+  end
+
   show do
     panel  "Info" do
       attributes_table_for(resource) do
@@ -22,6 +40,13 @@ ActiveAdmin.register Player, as: "Players" do
         row :login
         row :location
         row :position
+        row "Equip Slots" do |obj|
+          obj.head_slot.present? && obj.body_slot.present? && obj.legs_slot.present? && obj.primary_slot.present? && obj.secondary_slot.present?
+        end
+        row "Bag Slots" do |obj|
+          obj.bag_slots.count
+        end
+        row :bag_pages
         row :created_at
         row :updated_at
       end

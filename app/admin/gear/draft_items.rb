@@ -1,7 +1,7 @@
 ActiveAdmin.register Draft::Item::Base, as: "Draft Items" do
   menu priority: 4
 
-  permit_params :name, :type
+  permit_params :name, :type, :player_id
 
   filter :id
   filter :name
@@ -36,6 +36,7 @@ ActiveAdmin.register Draft::Item::Base, as: "Draft Items" do
     f.inputs do
       f.input :name
       f.input :type, as: :select, collection: Draft::Item::Base::TYPES, include_blank: false
+      f.input :player_id, label: "Spawn for", as: :select, collection: Player.all.map { |p| ["#{p.login} [#{p.id}]", p.id] }
     end
     f.actions
   end

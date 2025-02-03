@@ -1,0 +1,54 @@
+services:
+  db:
+    container_name: mo_db
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    networks:
+      - mo_network
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  redis:
+    container_name: mo_redis
+    image: redis
+    networks:
+      - mo_network
+    restart: always
+  api:
+    container_name: mo_api
+    build:
+      context: .
+      dockerfile: docker/development/Dockerfile.api
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - mo_network
+    volumes:
+      - ./:/api
+    tty: true
+    stdin_open: true
+  direct:
+    container_name: mo_direct
+    build:
+      context: .
+      dockerfile: docker/development/Dockerfile.direct
+    ports:
+      - "4000:4000"
+    depends_on:
+      - api
+    networks:
+      - mo_network
+    volumes:
+      - ./direct:/direct
+networks:
+  mo_network:
+   name: 'mo_network'
+volumes:
+  db_data:

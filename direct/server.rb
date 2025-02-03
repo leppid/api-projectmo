@@ -1,5 +1,7 @@
 require 'socket'
+require 'logger'
 # require './player'
+
 class Location
   attr_accessor :name, :players
 
@@ -31,9 +33,16 @@ class DirectServer
   end
 
   def run
+    $stdout.sync = true
+    logger = Logger.new($stdout)
+    logger.info('
+    _/﹋\_
+    (҂`_´)
+    <,︻╦╤─ ҉ - - DIRECT SERVER IS ACTIVE - - ҉ ─╤╦︻,>
+    _/﹋\_
+    ')
     loop do
       Thread.start(@server.accept) do |client|
-        client.puts 'Welcome to the server!'
         listen_commands(client)
       end
     end
