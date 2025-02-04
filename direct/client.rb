@@ -2,7 +2,7 @@ require 'socket'
 
 class DirectClient
   def initialize
-    @server = TCPSocket.new('localhost', 3002)
+    @server = TCPSocket.new('0.0.0.0', 3001)
     @request = nil
     @response = nil
     listen

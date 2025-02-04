@@ -4,7 +4,7 @@ end
 
 player = Player.cc
 
-if player.stuff.blank?
+if player.inventory.blank?
   Draft::Armor::Body.find_or_create_by!(name: 'Grey Armor', model: "armor1").spawn_for(player)
   Draft::Armor::Body.find_or_create_by!(name: 'Red Armor', model: "armor2").spawn_for(player)
   Draft::Armor::Body.find_or_create_by!(name: 'Skull Armor', model: "armor3").spawn_for(player)

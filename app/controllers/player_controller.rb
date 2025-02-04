@@ -1,22 +1,17 @@
 class PlayerController < ApplicationController
   expose :player, -> { current_player }
-  expose :stuff, -> { player&.stuff&.filter { |item| item.slot.present? } }
-  expose :stuff_without_slot, -> { player&.stuff&.filter { |item| item.slot.nil? } }
+  expose :inventory, -> { player&.inventory&.filter { |item| item.slot.present? } }
+  expose :inventory_without_slot, -> { player&.inventory&.filter { |item| item.slot.nil? } }
 
   def index
-    render json: PlayerBlueprint.render(player), status: :ok
-  end
-
-  def inventory
-    stuff_without_slot.each(&:set_bag_slot)
-    render json: InventoryBlueprint.render(stuff), status: :ok
+    render json: SyncBlueprint.render(player), status: :ok
   end
 
   def sync
     sync_position
     sync_inventory
 
-    head :ok
+    render json: SyncBlueprint.render(player), status: :ok
   end
 
   private
@@ -28,20 +23,18 @@ class PlayerController < ApplicationController
   end
 
   def sync_inventory
-    stuff_without_slot.each(&:set_bag_slot)
+    inventory_without_slot.each(&:set_bag_slot)
 
     return if player_params[:inventory].blank?
 
     player_params[:inventory].each do |inv_item|
-      item = player.stuff.select { |i| i.id == inv_item[:id] }.first
+      item = player.inventory.select { |i| i.id == inv_item[:id] }.first
       slot = player.slots.find_by(index: inv_item[:index])
 
       next if item.blank? || slot.blank?
 
       item.update(slot: slot)
     end
-
-    head :ok
   end
 
   def player_params

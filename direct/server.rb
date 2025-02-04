@@ -12,22 +12,24 @@ class Location
 end
 
 class Player
-  attr_accessor :log, :pos, :vel, :rot, :models, :timestamp
+  attr_accessor :ip, :log, :pos, :vel, :rot, :models
 
-  def initialize(log = nil, pos = nil, vel = nil, rot = nil, models = []) # rubocop:disable Metrics/ParameterLists
+  def initialize(ip = nil, log = nil, pos = nil, vel = nil, rot = nil, models = []) # rubocop:disable Metrics/ParameterLists
+    @ip = ip
     @log = log
     @pos = pos
     @vel = vel
     @rot = rot
     @models = models
-    @timestamp = Time.now
   end
 end
 
 class DirectServer
+  TIMEOUT = 5
+
   def initialize
-    @server = TCPServer.new '0.0.0.0', 3002
-    @login_attempts = {}
+    @server = TCPServer.new '0.0.0.0', 3001
+    @timers = {}
     @locations = {}
     run
   end
@@ -71,6 +73,7 @@ class DirectServer
   end
 
   def sync(data, client)
+    ip = client.peeraddr[3]
     loc = data.split('@')[1]
     log = data.split('@')[2]
     pos = data.split('@')[3]
@@ -79,27 +82,27 @@ class DirectServer
     models = data.split('@')[6] || ''
 
     if @locations[loc]
-      @locations[loc].players = @locations[loc].players.filter { |p| p.log != log } << Player.new(log, pos, vel, rot, models.split(','))
+      @locations[loc].players = @locations[loc].players.filter { |p| p.log != log } << Player.new(ip, log, pos, vel, rot, models.split(','))
     else
-      @locations[loc] = Location.new(loc, [Player.new(log, pos, vel, rot, models.split(','))])
+      @locations[loc] = Location.new(loc, [Player.new(ip, log, pos, vel, rot, models.split(','))])
     end
 
     players = @locations[loc].players
 
     puts players
 
-    puts "Synced player: #{loc} @ #{log} @ #{pos} @ #{vel} @ #{rot} @ #{models}"
+    puts "Synced player: @ #{loc} @ #{log} @ #{ip} @ #{pos} @ #{vel} @ #{rot} @ #{models}"
     client.puts "sync@#{players.map { |p| "#{loc}@#{p.log}@#{p.pos}@#{p.vel}@#{p.rot}@#{p.models.join(',')}" }.join('&')}"
 
-    cleanup_locations(loc, log)
+    cleanup_locations(ip, loc)
   end
 
-  def cleanup_locations(loc, log)
+  def cleanup_locations(ip, loc)
     @locations.each_key do |key|
       players = @locations[key].players
       players.each do |player|
-        next if loc == key
-        next unless player.log == log
+        next if key == loc
+        next unless player.ip == ip
 
         players.delete(player)
       end

@@ -30,7 +30,7 @@ class Player < ApplicationRecord
 
   after_create :create_equip_slots, :create_bag_slots, :create_bag_page
 
-  def stuff
+  def inventory
     armors + weapons + items
   end
 
