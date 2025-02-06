@@ -2,11 +2,13 @@ module Spawnable
   extend ActiveSupport::Concern
 
   included do
+    attr_accessor :player_id
+
     after_update :spawn
   end
 
   def spawn
-    return unless player_id
+    return if player_id.blank?
 
     spawn_for(Player.find(player_id))
   end

@@ -1,7 +1,7 @@
 class PlayerController < ApplicationController
   expose :player, -> { current_player }
-  expose :inventory, -> { player&.inventory&.filter { |item| item.slot.present? } }
-  expose :inventory_without_slot, -> { player&.inventory&.filter { |item| item.slot.nil? } }
+  expose :inventory, -> { player&.inventory_with_slot }
+  expose :inventory_without_slot, -> { player&.inventory_without_slot }
 
   def index
     render json: SyncBlueprint.render(player), status: :ok
@@ -23,8 +23,6 @@ class PlayerController < ApplicationController
   end
 
   def sync_inventory
-    inventory_without_slot.each(&:set_bag_slot)
-
     return if player_params[:inventory].blank?
 
     player_params[:inventory].each do |inv_item|
@@ -35,6 +33,8 @@ class PlayerController < ApplicationController
 
       item.update(slot: slot)
     end
+
+    inventory_without_slot.each(&:set_bag_slot)
   end
 
   def player_params

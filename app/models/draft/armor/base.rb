@@ -5,5 +5,5 @@ class Draft::Armor::Base < ApplicationRecord
 
   self.table_name = 'draft_armors'
 
-  has_many :game_armors, class_name: 'Game::Armor::Base', dependent: :destroy
+  has_many :game_armors, class_name: 'Game::Armor::Base', foreign_key: :draft_armor_id, dependent: :destroy
 end

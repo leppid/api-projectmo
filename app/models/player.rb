@@ -34,6 +34,14 @@ class Player < ApplicationRecord
     armors + weapons + items
   end
 
+  def inventory_with_slot
+    inventory.select { |i| i.slot.present? }
+  end
+
+  def inventory_without_slot
+    inventory.select { |i| i.slot.nil? }
+  end
+
   def empty_bag_slot
     bag_slots.order(:index).find(&:empty?)
   end
@@ -51,7 +59,22 @@ class Player < ApplicationRecord
   end
 
   def self.cc
-    find_by(login: 'playercc') || create(login: 'playercc', password: 'password')
+    find_by(login: 'lepple') || create(login: 'lepple', password: 'password')
+  end
+
+  def self.test(login)
+    exists = find_by(login: login)
+    test_player = exists || create(login: login, password: 'password')
+    unless exists
+      Draft::Armor::Base.where(test: true).each do |armor|
+        armor.spawn_for(test_player)
+      end
+      Draft::Weapon::Base.where(test: true).each do |weapon|
+        weapon.spawn_for(test_player)
+      end
+      test_player.inventory_without_slot.each(&:set_bag_slot)
+    end
+    test_player
   end
 
   def create_equip_slots

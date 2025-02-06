@@ -5,6 +5,7 @@ class CreateDraftItems < ActiveRecord::Migration[8.0]
       t.string :type, default: "Draft::Item::Base"
       t.string :name
       t.string :description
+      t.boolean :test, default: false
     end
   end
 end

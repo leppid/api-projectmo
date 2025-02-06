@@ -5,6 +5,7 @@ class CreateDraftWeapons < ActiveRecord::Migration[8.0]
       t.string :type, default: "Draft::Weapon::Base"
       t.string :name
       t.string :model
+      t.boolean :test, default: false
     end
   end
 end
