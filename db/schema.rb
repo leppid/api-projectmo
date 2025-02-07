@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_28_145341) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_06_171633) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -102,6 +102,12 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_28_145341) do
     t.string "location"
     t.string "position"
     t.integer "bag_pages", default: 1
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "servers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.boolean "open", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

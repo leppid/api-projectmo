@@ -2,6 +2,8 @@ if Rails.env.development?
   Admin::User.create!(email: 'admin@gmail.com', password: 'password', password_confirmation: 'password') if Admin::User.find_by(email: 'admin@gmail.com').nil?
 end
 
+Server.init
+
 player = Player.cc
 
 if player.inventory.blank?

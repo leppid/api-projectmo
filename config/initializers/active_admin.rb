@@ -6,7 +6,7 @@ ActiveAdmin.setup do |config|
   #
   config.site_title = "Projectmo"
 
-  config.skip_before_action :authenticate_player
+  config.skip_before_action :check_server, :authenticate_player
   
   config.authentication_method = :authenticate_admin_user!
 

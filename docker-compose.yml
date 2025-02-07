@@ -2,8 +2,6 @@ services:
   db:
     container_name: mo_db
     image: postgres
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     networks:
@@ -39,6 +37,8 @@ services:
     build:
       context: .
       dockerfile: docker/development/Dockerfile.direct
+    env_file:
+      - .env
     ports:
       - "3001:3001"
     depends_on:

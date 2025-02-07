@@ -5,6 +5,8 @@ WORKDIR /direct
 RUN apt-get update -qq && \
     apt-get upgrade -y
 
+RUN gem install jwt
+
 COPY ./direct .
 
 CMD [ "ruby", "server.rb" ]

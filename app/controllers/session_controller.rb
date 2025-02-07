@@ -11,7 +11,7 @@ class SessionController < ApplicationController
     if player&.authenticate(params[:password])
       render json: SyncBlueprint.render_as_json(player).merge(token: encode_auth_token(player)), status: :ok
     else
-      render json: { message: 'Invalid Login or Password' }, status: :unauthorized
+      render json: { message: 'Invalid login or password' }, status: :unauthorized
     end
   end
 end

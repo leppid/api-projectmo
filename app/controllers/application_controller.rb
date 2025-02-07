@@ -3,18 +3,22 @@ class ApplicationController < ActionController::Base
 
   wrap_parameters false
 
-  before_action :authenticate_player
+  before_action :check_server, :authenticate_player
 
   def current_player
     return if decoded_auth_token.blank?
 
     return if token_expired?
 
-    @current_player ||= Player.find(decoded_auth_token['player_id'])
+    @current_player ||= Player.find_by(id: decoded_auth_token['player_id'])
+  end
+
+  def check_server
+    render json: { message: 'Server on maintenance' }, status: :service_unavailable unless Server.open?
   end
 
   def authenticate_player
-    render json: { message: 'Not Authorized' }, status: :unauthorized unless current_player
+    render json: { message: 'Not authorized' }, status: :unauthorized unless current_player
   end
 
   def encode_auth_token(player)
