@@ -4,9 +4,10 @@ require 'json'
 require 'jwt'
 
 class Player
-  attr_accessor :id, :log, :loc, :pos, :vel, :rot, :models, :time
+  attr_accessor :ip, :id, :log, :loc, :pos, :vel, :rot, :models, :time
 
-  def initialize(id, log, loc, pos, vel, rot, models = []) # rubocop:disable Metrics/ParameterLists
+  def initialize(ip = nil, id = nil, log = nil, loc = nil, pos = nil, vel = nil, rot = nil, models = []) # rubocop:disable Metrics/ParameterLists
+    @ip = ip
     @id = id
     @log = log
     @loc = loc
@@ -23,7 +24,6 @@ class DirectServer # rubocop:disable Metrics/ClassLength
 
   def initialize
     @server = TCPServer.new '0.0.0.0', 3001
-    @authorized = []
     @players = []
     run
   end
@@ -55,7 +55,6 @@ class DirectServer # rubocop:disable Metrics/ClassLength
 
         puts "Player timed out: #{player.log} (#{player.id})"
         cleanup_players(player.id)
-        cleanup_authorized(player.id)
       end
     end
   end
@@ -65,12 +64,12 @@ class DirectServer # rubocop:disable Metrics/ClassLength
       cmd = client&.gets&.chomp
       return if cmd.nil? || cmd == ''
 
-      if cmd.start_with?('sync ')
-        sync(client, cmd)
-      elsif cmd.start_with?('check ')
+      if cmd.start_with?('check ')
         check(client, cmd)
       elsif cmd.start_with?('login ')
         login(client, cmd)
+      elsif cmd.start_with?('sync ')
+        sync(client, cmd)
       elsif cmd.start_with?('logout ')
         logout(client, cmd)
       else
@@ -92,7 +91,7 @@ class DirectServer # rubocop:disable Metrics/ClassLength
       puts "Invalid token: #{player_token}"
       return
     end
-    if @authorized.include?(player_id)
+    if collision?(player_id)
       client.puts 'check@failed'
       puts "Session collision: #{player_id}"
       return
@@ -114,27 +113,29 @@ class DirectServer # rubocop:disable Metrics/ClassLength
       puts "Invalid token: #{player_token}"
       return
     end
-    if @authorized.include?(player_id)
-      client.puts 'login@success'
-      puts "Authorized: #{player_id}"
+    if collision?(player_id)
+      client.puts 'login@failed'
+      puts "Session collision: #{player_id}"
       return
     end
-    @authorized.push(player_id)
+    @players.push(Player.new(client.peeraddr[3], player_id))
     client.puts 'login@success'
     puts "Authorize success: #{player_id}"
   end
 
   def sync(client, data)
-    id = data.split('@')[1]
-    return unless authorized(id)
+    ip = client.peeraddr[3]
+    values = data.delete_prefix('sync @').split('@')
+    id = values[0]
+    return client.close unless authorized?(ip, id)
 
-    log = data.split('@')[2]
-    loc = data.split('@')[3]
-    pos = data.split('@')[4]
-    vel = data.split('@')[5]
-    rot = data.split('@')[6]
-    models = data.split('@')[7] || ''
-    @players = @players.reject { |p| p.id == id }.push(Player.new(id, log, loc, pos, vel, rot, models.split(',')))
+    log = values[1]
+    loc = values[2]
+    pos = values[3]
+    vel = values[4]
+    rot = values[5]
+    models = values[6] || ''
+    @players = @players.reject { |p| p.id == id }.push(Player.new(ip, id, log, loc, pos, vel, rot, models.split(',')))
     local_players = @players.select { |p| p.loc == loc && p.id != id }
     client.puts "sync@#{local_players.map { |p| "#{p.id}@#{p.log}@#{p.loc}@#{p.pos}@#{p.vel}@#{p.rot}@#{p.models.join(',')}" }.join('&')}"
     # puts "Synced player: @ #{id} @ #{log} @ #{loc} @ #{pos} @ #{vel} @ #{rot} @ #{models}"
@@ -153,22 +154,21 @@ class DirectServer # rubocop:disable Metrics/ClassLength
       puts "Invalid token: #{player_token}"
       return
     end
-    cleanup_authorized(player_id)
     cleanup_players(player_id)
     client.puts 'logout@success'
     puts "Unauthorize success: #{player_id}"
   end
 
-  def authorized(id)
-    unless @authorized.include?(id)
-      puts "Unauthorized: #{id}"
-      return false
-    end
-    true
+  def collision?(id)
+    return true if @players.find { |p| p.id == id }
+
+    false
   end
 
-  def cleanup_authorized(id)
-    @authorized = @authorized.reject { |i| i == id }
+  def authorized?(ip, id)
+    return true if @players.find { |p| p.ip == ip && p.id == id }
+
+    false
   end
 
   def cleanup_players(id)
