@@ -1,3 +1,4 @@
+require 'securerandom'
 require 'socket'
 require 'logger'
 require 'redis'
@@ -6,17 +7,21 @@ require 'jwt'
 require 'oj'
 
 class Player
-  attr_accessor :ip, :id, :log, :loc, :pos, :vel, :rot, :models, :time
+  attr_accessor :sid, :id, :log, :loc, :pos, :vel, :rot, :models, :time
 
-  def initialize(ip = nil, id = nil, log = nil, loc = nil, pos = nil, vel = nil, rot = nil, models = []) # rubocop:disable Metrics/ParameterLists
-    @ip = ip
-    @id = id
-    @log = log
-    @loc = loc
-    @pos = pos
-    @vel = vel
-    @rot = rot
-    @models = models
+  def initialize(params = {})
+    @sid = SecureRandom.uuid
+    update(params)
+  end
+
+  def update(params)
+    @id = params[:id]
+    @log = params[:log]
+    @loc = params[:loc]
+    @pos = params[:pos]
+    @vel = params[:vel]
+    @rot = params[:rot]
+    @models = params[:models]
     @time = Time.now
   end
 end
@@ -30,12 +35,19 @@ class DirectServer # rubocop:disable Metrics/ClassLength
     Oj.load(dirrect_players)
   end
 
-  def add_player(player)
-    data = players.reject { |p| p.id == player.id }.push(player)
-    REDIS.set('direct_players', Oj.dump(data))
+  def get_player(id)
+    players.find { |p| p.id == id }
   end
 
-  def remove_player(id)
+  def update_player(params)
+    player = players.find { |p| p.id == params[:id] } || Player.new(params)
+    player.update(params)
+    data = players.reject { |p| p.id == params[:id] }.push(player)
+    REDIS.set('direct_players', Oj.dump(data))
+    player
+  end
+
+  def delete_player(id)
     data = players.reject { |p| p.id == id }
     REDIS.set('direct_players', Oj.dump(data))
   end
@@ -68,12 +80,11 @@ class DirectServer # rubocop:disable Metrics/ClassLength
   def process_timouts
     loop do
       sleep 1
-      # p players
       players.each do |player|
         next unless (Time.now - player.time) > TIMEOUT
 
-        puts "Player timed out: #{player.log} (#{player.id})"
-        remove_player(player.id)
+        puts "Player timed out: #{player.log} #{player.id}"
+        delete_player(player.id)
       end
     end
   end
@@ -81,15 +92,16 @@ class DirectServer # rubocop:disable Metrics/ClassLength
   def listen_commands(client)
     loop do
       cmd = client&.gets&.chomp
+
       return if cmd.nil? || cmd == ''
 
-      if cmd.start_with?('check ')
-        check(client, cmd)
-      elsif cmd.start_with?('login ')
+      if cmd.start_with?('login@')
         login(client, cmd)
-      elsif cmd.start_with?('sync ')
+      elsif cmd.start_with?('check@')
+        check(client, cmd)
+      elsif cmd.start_with?('sync@')
         sync(client, cmd)
-      elsif cmd.start_with?('logout ')
+      elsif cmd.start_with?('logout@')
         logout(client, cmd)
       else
         client.puts 'Invalid command'
@@ -97,87 +109,92 @@ class DirectServer # rubocop:disable Metrics/ClassLength
     end
   end
 
+  def login(client, data)
+    token = data.split('@')[1]
+    if token.nil? || token == ''
+      client.puts 'login@failed'
+      puts 'Invalid null token'
+      return
+    end
+    id = decode_token(token)['player_id']
+    if id.nil?
+      client.puts 'login@failed'
+      puts "Invalid token: #{token}"
+      return
+    end
+    sid = data.split('@')[2]
+    if collision?(id) && !authorized?(id, sid)
+      client.puts 'login@failed'
+      puts "Session collision: #{id}"
+      return
+    end
+    new_player = update_player({ id: id })
+    client.puts "login@success@#{new_player.sid}"
+    puts "Authorization success: #{id}"
+  end
+
   def check(client, data)
-    player_token = data.split('@')[1]
-    if player_token.nil? || player_token == ''
+    token = data.split('@')[1]
+    if token.nil? || token == ''
       client.puts 'check@failed'
       puts 'Invalid null token'
       return
     end
-    player_id = decode_token(player_token)['player_id']
-    if player_id.nil?
+    id = decode_token(token)['player_id']
+    if id.nil?
       client.puts 'check@failed'
-      puts "Invalid token: #{player_token}"
+      puts "Invalid token: #{token}"
       return
     end
-    if collision?(player_id)
+    sid = data.split('@')[2]
+    unless authorized?(id, sid)
       client.puts 'check@failed'
-      puts "Session collision: #{player_id}"
+      puts "Authorization check failed: #{id}"
       return
     end
     client.puts 'check@success'
-    puts "Checked player: #{player_id}"
-  end
-
-  def login(client, data)
-    player_token = data.split('@')[1]
-    if player_token.nil? || player_token == ''
-      client.puts 'login@failed'
-      puts 'Invalid null token'
-      return
-    end
-    player_id = decode_token(player_token)['player_id']
-    if player_id.nil?
-      client.puts 'login@failed'
-      puts "Invalid token: #{player_token}"
-      return
-    end
-    if collision?(player_id)
-      client.puts 'login@failed'
-      puts "Session collision: #{player_id}"
-      return
-    end
-    add_player(Player.new(client.peeraddr[3], player_id))
-    client.puts 'login@success'
-    puts "Authorize success: #{player_id}"
+    puts "Authorization check success: #{id}"
   end
 
   def sync(client, data)
-    t = Time.now
-    ip = client.peeraddr[3]
-    values = data.delete_prefix('sync @').split('@')
-    id = values[0]
-    return client.close unless authorized?(ip, id)
-
-    log = values[1]
-    loc = values[2]
-    pos = values[3]
-    vel = values[4]
-    rot = values[5]
-    models = values[6] || ''
-    add_player(Player.new(ip, id, log, loc, pos, vel, rot, models.split(',')))
-    local_players = players.select { |p| p.loc == loc && p.id != id }
+    values = data.split('@')
+    hash = {
+      id: values[1],
+      log: values[2],
+      loc: values[3],
+      pos: values[4],
+      vel: values[5],
+      rot: values[6],
+      models: values[7] || ''
+    }
+    new_player = update_player(hash)
+    local_players = players.select { |p| p.loc == new_player.loc && p.id != new_player.id }
     client.puts "sync@#{local_players.map { |p| "#{p.id}@#{p.log}@#{p.loc}@#{p.pos}@#{p.vel}@#{p.rot}@#{p.models.join(',')}" }.join('&')}"
-    p Time.now - t
-    # puts "Synced player: @ #{id} @ #{log} @ #{loc} @ #{pos} @ #{vel} @ #{rot} @ #{models}"
+    # puts "Synced player: @ #{new_player.id} @ #{new_player.log} @ #{new_player.loc} @ #{new_player.pos} @ #{new_player.vel} @ #{new_player.rot} @ #{new_player.models}"
   end
 
   def logout(client, data)
-    player_token = data.split('@')[1]
-    if player_token.nil? || player_token == ''
+    token = data.split('@')[1]
+    if token.nil? || token == ''
       client.puts 'logout@failed'
       puts 'Invalid null token'
       return
     end
-    player_id = decode_token(player_token)['player_id']
-    if player_id.nil?
+    id = decode_token(token)['player_id']
+    if id.nil?
       client.puts 'logout@failed'
-      puts "Invalid token: #{player_token}"
+      puts "Invalid token: #{token}"
       return
     end
-    remove_player(player_id)
+    sid = data.split('@')[2]
+    unless authorized?(id, sid)
+      client.puts 'logout@failed'
+      puts "Invalid token: #{token}"
+      return
+    end
+    delete_player(id)
     client.puts 'logout@success'
-    puts "Unauthorize success: #{player_id}"
+    puts "Unauthorize success: #{id}"
   end
 
   def collision?(id)
@@ -186,8 +203,8 @@ class DirectServer # rubocop:disable Metrics/ClassLength
     false
   end
 
-  def authorized?(ip, id)
-    return true if players.find { |p| p.ip == ip && p.id == id }
+  def authorized?(id, sid)
+    return true if players.find { |p| p.id == id && p.sid == sid }
 
     false
   end
