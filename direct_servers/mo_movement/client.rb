@@ -1,8 +1,8 @@
 require 'socket'
 
-class DirectClient
+class MoMovementClient
   def initialize
-    @server = TCPSocket.new('0.0.0.0', 3001)
+    @server = TCPSocket.new('0.0.0.0', 3002)
     @request = nil
     @response = nil
     listen
@@ -30,4 +30,4 @@ class DirectClient
   end
 end
 
-DirectClient.new
+MoMovementClient.new

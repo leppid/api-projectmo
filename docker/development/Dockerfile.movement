@@ -1,14 +1,15 @@
 FROM ruby:3.2.3
 
-WORKDIR /direct
+WORKDIR /direct_servers
 
 RUN apt-get update -qq && \
     apt-get upgrade -y
 
 RUN gem install redis
-RUN gem install jwt
 RUN gem install oj
 
-COPY ./direct .
+COPY ./direct_servers .
+
+WORKDIR /direct_servers/mo_movement
 
 CMD [ "ruby", "server.rb" ]

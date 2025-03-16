@@ -32,11 +32,11 @@ services:
       - ./:/api
     tty: true
     stdin_open: true
-  direct:
-    container_name: mo_direct
+  session:
+    container_name: mo_session
     build:
       context: .
-      dockerfile: docker/development/Dockerfile.direct
+      dockerfile: docker/development/Dockerfile.session
     env_file:
       - .env
     ports:
@@ -46,7 +46,22 @@ services:
     networks:
       - mo_network
     volumes:
-      - ./direct:/direct
+      - ./direct_servers:/direct_servers
+  movement:
+    container_name: mo_movement
+    build:
+      context: .
+      dockerfile: docker/development/Dockerfile.movement
+    env_file:
+      - .env
+    ports:
+      - "3002:3002"
+    depends_on:
+      - session
+    networks:
+      - mo_network
+    volumes:
+      - ./direct_servers:/direct_servers
 networks:
   mo_network:
    name: 'mo_network'

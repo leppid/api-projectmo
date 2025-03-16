@@ -1,0 +1,16 @@
+FROM ruby:3.2.3
+
+WORKDIR /direct_servers
+
+RUN apt-get update -qq && \
+    apt-get upgrade -y
+
+RUN gem install redis
+RUN gem install jwt
+RUN gem install oj
+
+COPY ./direct_servers .
+
+WORKDIR /direct_servers/mo_session
+
+CMD [ "ruby", "server.rb" ]
