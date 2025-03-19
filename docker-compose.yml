@@ -22,7 +22,7 @@ services:
     env_file:
       - .env
     ports:
-      - "3000:3000"
+      - "9000:9000"
     depends_on:
       - db
       - redis
@@ -40,7 +40,7 @@ services:
     env_file:
       - .env
     ports:
-      - "3001:3001"
+      - "9001:9001"
     depends_on:
       - api
     networks:
@@ -55,7 +55,7 @@ services:
     env_file:
       - .env
     ports:
-      - "3002:3002"
+      - "9002:9002"
     depends_on:
       - session
     networks:

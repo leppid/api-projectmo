@@ -10,10 +10,10 @@ require '../session'
 
 class MoSessionServer # rubocop:disable Metrics/ClassLength
   HOST = '0.0.0.0'
-  PORT = 3001
+  PORT = 9001
   REDIS = Redis.new(host: 'redis', port: 6379)
   REDIS_KEY = 'mo_sessions'
-  TIMEOUT = 60
+  TIMEOUT = 300
 
   def sessions
     data = REDIS.get(REDIS_KEY) || '[]'
@@ -70,7 +70,7 @@ class MoSessionServer # rubocop:disable Metrics/ClassLength
       sessions.each do |session|
         next unless (Time.now - session.time) > TIMEOUT
 
-        puts "Session timed out: #{session.id} #{session.pid}"
+        puts "Session time out: #{session.id} #{session.pid}"
         delete(session.id)
       end
     end

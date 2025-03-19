@@ -9,7 +9,7 @@ require '../session'
 
 class MoMovementServer
   HOST = '0.0.0.0'
-  PORT = 3002
+  PORT = 9002
   REDIS = Redis.new(host: 'redis', port: 6379)
   REDIS_KEY = 'mo_movements'
   REDIS_SESSIONS_KEY = 'mo_sessions'
@@ -70,7 +70,7 @@ class MoMovementServer
       movements.each do |movement|
         next unless (Time.now - movement.time) > TIMEOUT
 
-        puts "Movement timed out: #{movement.log} #{movement.id}"
+        puts "Movement time out: #{movement.log} #{movement.id}"
         delete(movement.id)
       end
     end

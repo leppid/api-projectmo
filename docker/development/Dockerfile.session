@@ -11,6 +11,6 @@ RUN gem install oj
 
 COPY ./direct_servers .
 
-WORKDIR /direct_servers/mo_session
+WORKDIR /direct_servers/session
 
 CMD [ "ruby", "server.rb" ]
