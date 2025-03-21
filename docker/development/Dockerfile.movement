@@ -5,6 +5,7 @@ WORKDIR /direct_servers
 RUN apt-get update -qq && \
     apt-get upgrade -y
 
+RUN gem install msgpack
 RUN gem install redis
 RUN gem install oj
 

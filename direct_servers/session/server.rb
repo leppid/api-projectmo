@@ -1,4 +1,5 @@
 require 'securerandom'
+require 'msgpack'
 require 'socket'
 require 'logger'
 require 'redis'
@@ -8,40 +9,20 @@ require 'oj'
 
 require '../session'
 
-class MoSessionServer # rubocop:disable Metrics/ClassLength
+class DirectSessionServer # rubocop:disable Metrics/ClassLength
   HOST = '0.0.0.0'
   PORT = 9001
   REDIS = Redis.new(host: 'redis', port: 6379)
   REDIS_KEY = 'mo_sessions'
   TIMEOUT = 300
 
-  def sessions
-    data = REDIS.get(REDIS_KEY) || '[]'
-    Oj.load(data)
-  end
-
-  def get(id)
-    sessions.find { |p| p.id == id }
-  end
-
-  def create_or_update_by(params)
-    session = sessions.find { |p| p.id == params[:id] }
-    session&.touch || session = Session.new(params)
-    data = sessions.reject { |p| p.id == params[:id] }.push(session)
-    REDIS.set(REDIS_KEY, Oj.dump(data))
-    session
-  end
-
-  def delete(id)
-    data = sessions.reject { |p| p.id == id }
-    REDIS.set(REDIS_KEY, Oj.dump(data))
-  end
-
   def initialize
     REDIS.del(REDIS_KEY)
     @server = TCPServer.new HOST, PORT
     run
   end
+
+  private
 
   def run
     $stdout.sync = true
@@ -70,7 +51,7 @@ class MoSessionServer # rubocop:disable Metrics/ClassLength
       sessions.each do |session|
         next unless (Time.now - session.time) > TIMEOUT
 
-        puts "Session time out: #{session.id} #{session.pid}"
+        puts "[timeout] Session time out: #{session.player_id}"
         delete(session.id)
       end
     end
@@ -82,98 +63,107 @@ class MoSessionServer # rubocop:disable Metrics/ClassLength
 
       return if cmd.nil? || cmd == ''
 
-      if cmd.start_with?('login@')
-        login(client, cmd)
-      elsif cmd.start_with?('check@')
-        check(client, cmd)
-      elsif cmd.start_with?('logout@')
-        logout(client, cmd)
+      request = begin
+        MessagePack.unpack(cmd)
+      rescue
+        {}
+      end
+
+      case request['command']
+      when 'login'
+        login(client, request)
+      when 'ping'
+        ping(client, request)
+      when 'logout'
+        logout(client, request)
       else
         client.puts 'Invalid command'
       end
     end
   end
 
-  def login(client, data)
-    pid_token = data.split('@')[1]
-    if pid_token.nil? || pid_token == ''
-      client.puts 'login@failed'
-      puts 'Invalid token'
+  def login(client, request)
+    player_token = request['Params']['apiToken']
+    session_id = request['Params']['sessionId']
+    player_id = decode_token(player_token)['player_id']
+    if player_token.nil? || session_id.nil? || (collision?(player_id) && !authorized?(session_id, player_id))
+      response = { command: 'login', status: 'unauthorized' }.to_msgpack
+      client.puts response
+      puts "[login] Session not found or unavailable: #{player_id || 'nil'}"
       return
     end
-    id = data.split('@')[2]
-    if id.nil?
-      client.puts 'login@failed'
-      puts 'Invalid token'
-      return
-    end
-    pid = decode_token(pid_token)['player_id']
-    if collision?(pid) && !authorized?(id, pid)
-      client.puts 'login@failed'
-      puts 'Invalid token'
-      return
-    end
-    new_session = create_or_update_by({ pid: pid })
-    client.puts "login@success@#{new_session.id}"
-    puts "Authorization success: #{pid}"
+    new_session = create_or_update_by({ player_id: player_id })
+    response = { command: 'login', status: 'success', data: new_session.id }.to_msgpack
+    client.puts response
+    puts "[login] Authorization success: #{player_id}"
   end
 
-  def check(client, data)
-    pid_token = data.split('@')[1]
-    if pid_token.nil? || pid_token == ''
-      client.puts 'login@failed'
-      puts 'Invalid token'
+  def ping(client, request)
+    player_token = request['Params']['apiToken']
+    session_id = request['Params']['sessionId']
+    player_id = decode_token(player_token)['player_id']
+    if player_token.nil? || session_id.nil? || !authorized?(session_id, player_id)
+      response = { command: 'ping', status: 'unauthorized' }.to_msgpack
+      client.puts response
+      puts "[ping] Session not found or unavailable: #{player_id || 'nil'}"
       return
     end
-    id = data.split('@')[2]
-    if id.nil?
-      client.puts 'login@failed'
-      puts 'Invalid token'
-      return
-    end
-    pid = decode_token(pid_token)['player_id']
-    unless authorized?(id, pid)
-      client.puts 'check@failed'
-      puts 'Invalid token'
-      return
-    end
-    create_or_update_by({ id: id, pid: pid })
-    client.puts 'check@success'
-    puts "Authorization check success: #{pid}"
+    create_or_update_by({ id: session_id, player_id: player_id })
+    response = { command: 'ping', status: 'success' }.to_msgpack
+    client.puts response
+    puts "[ping] Authorization ping success: #{player_id}"
   end
 
-  def logout(client, data)
-    pid_token = data.split('@')[1]
-    if pid_token.nil? || pid_token == ''
-      client.puts 'login@failed'
-      puts 'Invalid token'
+  def logout(client, request)
+    player_token = request['Params']['apiToken']
+    session_id = request['Params']['sessionId']
+    player_id = decode_token(player_token)['player_id']
+    if player_token.nil? || session_id.nil? || !authorized?(session_id, player_id)
+      response = { command: 'logout', status: 'unauthorized' }.to_msgpack
+      client.puts response
+      puts "[logout] Session not found or unavailable: #{player_id || 'nil'}"
       return
     end
-    id = data.split('@')[2]
-    if id.nil?
-      client.puts 'login@failed'
-      puts 'Invalid token'
-      return
-    end
-    pid = decode_token(pid_token)['player_id']
-    unless authorized?(id, pid)
-      client.puts 'logout@failed'
-      puts 'Invalid token'
-      return
-    end
-    delete(id)
-    client.puts 'logout@success'
-    puts "Unauthorization success: #{pid}"
+    delete(session_id)
+    response = { command: 'logout', status: 'success' }.to_msgpack
+    client.puts response
+    puts "[logout] Unauthorization success: #{player_id}"
   end
 
-  def collision?(pid)
-    return true if sessions.find { |p| p.pid == pid }
+  def sessions
+    data = REDIS.get(REDIS_KEY) || '[]'
+    Oj.load(data)
+  end
+
+  def get(session_id = nil, player_id = nil)
+    if session_id
+      sessions.find { |s| s.id == session_id }
+    elsif player_id
+      sessions.find { |s| s.player_id == player_id }
+    end
+  end
+
+  def create_or_update_by(params)
+    session = sessions.find { |s| s.player_id == params[:player_id] }
+    session&.touch || session = Session.new(params)
+    data = sessions.reject { |s| s.player_id == params[:player_id] }.push(session)
+    REDIS.set(REDIS_KEY, Oj.dump(data))
+    session
+  end
+
+  def delete(session_id)
+    data = sessions.reject { |s| s.id == session_id }
+    REDIS.set(REDIS_KEY, Oj.dump(data))
+  end
+
+  def collision?(player_id)
+    return true if sessions.find { |s| s.player_id == player_id }
 
     false
   end
 
-  def authorized?(id, pid)
-    return true if sessions.find { |p| p.id == id && p.pid == pid }
+  def authorized?(session_id, player_id)
+    return true if sessions.find { |s| s.id == session_id && s.player_id == player_id }
 
     false
   end
@@ -183,4 +173,4 @@ class MoSessionServer # rubocop:disable Metrics/ClassLength
   end
 end
 
-MoSessionServer.new
+DirectSessionServer.new

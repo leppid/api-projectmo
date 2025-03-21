@@ -1,9 +1,9 @@
 class Session
-  attr_accessor :id, :pid, :time
+  attr_accessor :id, :player_id, :time
 
   def initialize(params = {})
     @id = SecureRandom.uuid
-    @pid = params[:pid]
+    @player_id = params[:player_id]
     touch
   end
 
