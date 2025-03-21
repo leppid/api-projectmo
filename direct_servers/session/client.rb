@@ -1,8 +1,8 @@
 require 'socket'
 
-class MoSessionClient
+class DirectSessionClient
   def initialize
-    @server = TCPSocket.new('0.0.0.0', 3001)
+    @server = TCPSocket.new('0.0.0.0', 9001)
     @request = nil
     @response = nil
     listen
@@ -30,4 +30,4 @@ class MoSessionClient
   end
 end
 
-MoSessionClient.new
+DirectSessionClient.new
