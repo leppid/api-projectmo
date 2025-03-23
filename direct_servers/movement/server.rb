@@ -133,11 +133,12 @@ class DirectMovementServer # rubocop:disable Metrics/ClassLength
       pos: movement_params['pos'],
       vel: movement_params['vel'],
       rot: movement_params['rot'],
+      speed: movement_params['speed'],
       models: movement_params['models']
     }
     updated_movement = create_or_update_by(hash)
     local_movements = movements.select { |p| p.loc == updated_movement.loc && p.id != updated_movement.id }
-    response = { command: 'sync', status: 'success', data: local_movements.map { |m| { id: m.id, log: m.log, loc: m.loc, pos: m.pos, vel: m.vel, rot: m.rot, models: m.models } } }.to_msgpack
+    response = { command: 'sync', status: 'success', data: local_movements.map { |m| { id: m.id, log: m.log, loc: m.loc, pos: m.pos, vel: m.vel, rot: m.rot, speed: m.speed, models: m.models } } }.to_msgpack
     client.puts response
     @fps = (1 / (Time.now - t)).to_i
   end

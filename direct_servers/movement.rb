@@ -1,5 +1,5 @@
 class Movement
-  attr_accessor :id, :log, :loc, :pos, :vel, :rot, :models, :time
+  attr_accessor :id, :log, :loc, :pos, :vel, :rot, :speed, :models, :time
 
   def initialize(params = {})
     update(params)
@@ -12,6 +12,7 @@ class Movement
     @pos = params[:pos]
     @vel = params[:vel]
     @rot = params[:rot]
+    @speed = params[:speed]
     @models = params[:models]
     @time = Time.now
   end
