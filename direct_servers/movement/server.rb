@@ -53,7 +53,7 @@ class DirectMovementServer # rubocop:disable Metrics/ClassLength
   def process_timouts
     loop do
       sleep 1
-      puts "Server fps: #{fps}"
+      puts "[stats] Server fps: #{fps} #{"[#{@slots.length}/#{SLOTS}]"}" unless @slots.empty?
       movements.each do |movement|
         next unless (Time.now - movement.time) > TIMEOUT
 
