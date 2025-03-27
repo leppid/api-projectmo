@@ -5,6 +5,10 @@ class CreateDraftArmors < ActiveRecord::Migration[8.0]
       t.string :type, default: "Draft::Armor::Base"
       t.string :name
       t.string :model
+      t.boolean :disable_head, default: false
+      t.boolean :disable_body, default: false
+      t.boolean :disable_arms, default: false
+      t.boolean :disable_legs, default: false
       t.boolean :test, default: false
     end
   end

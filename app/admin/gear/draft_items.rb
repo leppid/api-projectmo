@@ -15,6 +15,7 @@ ActiveAdmin.register Draft::Item::Base, as: "Draft Items" do
     column :count_exists do |obj|
       link_to "#{Game::Item::Base.where(draft_item_id: obj.id).count} units", admin_game_items_path(q: { draft_item_id_eq: obj.id })
     end
+    column :test
     column :created_at
     column :updated_at
     actions
@@ -29,6 +30,7 @@ ActiveAdmin.register Draft::Item::Base, as: "Draft Items" do
       end
       row :created_at
       row :updated_at
+      row :test
     end
   end
 
@@ -37,6 +39,7 @@ ActiveAdmin.register Draft::Item::Base, as: "Draft Items" do
       f.input :name
       f.input :type, as: :select, collection: Draft::Item::Base::TYPES, include_blank: false
       f.input :player_id, label: "Spawn for", as: :select, collection: Player.all.map { |p| ["#{p.login} [#{p.id}]", p.id] }
+      f.input :test
     end
     f.actions
   end

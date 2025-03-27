@@ -59,7 +59,7 @@ class Player < ApplicationRecord
   end
 
   def self.cc
-    find_by(login: 'lepple') || create(login: 'lepple', password: 'password')
+    find_by(login: 'lepple') || test('lepple')
   end
 
   def self.test(login)

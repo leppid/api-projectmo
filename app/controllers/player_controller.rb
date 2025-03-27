@@ -17,15 +17,15 @@ class PlayerController < ApplicationController
   private
 
   def sync_position
-    return if player_params[:location].blank? || player_params[:position].blank?
+    return if params[:location].blank? || params[:position].blank?
 
-    player.update(location: player_params[:location], position: player_params[:position])
+    player.update(location: params[:location], position: params[:position])
   end
 
   def sync_inventory
-    return if player_params[:inventory].blank?
+    return if params[:inventory].blank?
 
-    player_params[:inventory].each do |inv_item|
+    params[:inventory].each do |inv_item|
       item = player.inventory.select { |i| i.id == inv_item[:id] }.first
       slot = player.slots.find_by(index: inv_item[:index])
 
@@ -35,9 +35,5 @@ class PlayerController < ApplicationController
     end
 
     inventory_without_slot.each(&:set_bag_slot)
-  end
-
-  def player_params
-    params.permit(:location, :position, inventory: %i[id name type index model color])
   end
 end

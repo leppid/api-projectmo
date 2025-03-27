@@ -9,16 +9,32 @@ class Game::Armor::Base < ApplicationRecord
 
   before_create :set_parent_type
 
-  def model
-    draft_armor.model.downcase
-  end
-
   def index
     slot&.index
   end
 
   def name
     draft_armor.name
+  end
+
+  def model
+    draft_armor.model.downcase
+  end
+
+  def disable_head
+    draft_armor.disable_head
+  end
+
+  def disable_body
+    draft_armor.disable_body
+  end
+
+  def disable_arms
+    draft_armor.disable_arms
+  end
+
+  def disable_legs
+    draft_armor.disable_legs
   end
 
   def unequip
