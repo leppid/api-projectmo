@@ -46,8 +46,10 @@ class Player < ApplicationRecord
     bag_slots.order(:index).find(&:empty?)
   end
 
-  def create_bag_page
-    create_bag_slots
+  def create_bag_page(count = 1)
+    count.times do
+      create_bag_slots
+    end
     update_column(:bag_pages, bag_pages + 1)
   end
 
@@ -58,14 +60,11 @@ class Player < ApplicationRecord
     update_column(:bag_pages, bag_pages - 1)
   end
 
-  def self.cc
-    find_by(login: 'lepple') || test('lepple')
-  end
-
   def self.test(login)
     exists = find_by(login: login)
     test_player = exists || create(login: login, password: 'password')
     unless exists
+      test_player.create_bag_page(2)
       Draft::Armor::Base.where(test: true).each do |armor|
         armor.spawn_for(test_player)
       end
