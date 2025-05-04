@@ -1,5 +1,5 @@
 ActiveAdmin.register Draft::Armor::Base, as: 'Draft Armors' do
-  menu priority: 2
+  menu priority: 3
 
   permit_params :name, :model, :type, :player_id, :disable_head, :disable_body, :disable_arms, :disable_legs
 

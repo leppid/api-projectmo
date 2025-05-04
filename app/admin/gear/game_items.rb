@@ -1,5 +1,5 @@
 ActiveAdmin.register Game::Item::Base, as: "Game Items" do
-  menu priority: 7
+  menu priority: 8
 
   permit_params :player_id, :draft_item_id
 

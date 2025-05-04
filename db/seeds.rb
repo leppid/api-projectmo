@@ -34,4 +34,6 @@ Player.test("lepple")
 Player.test("raven")
 Player.test("natafive")
 
+Enemy.find_or_create_by!(name: 'Wolf', model: "wolf", min_damage: 10, max_damage: 20, crit_multiplier: 2, crit_chance: 20)
+
 puts "Seed done"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_06_171633) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_29_212149) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -70,6 +70,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_06_171633) do
     t.string "name"
     t.string "model"
     t.boolean "test", default: false
+  end
+
+  create_table "enemies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "model"
+    t.float "health"
+    t.float "armor"
+    t.float "min_damage"
+    t.float "max_damage"
+    t.float "crit_multiplier"
+    t.float "crit_chance"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "game_armors", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

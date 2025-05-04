@@ -1,5 +1,5 @@
 ActiveAdmin.register Game::Weapon::Base, as: "Game Weapons" do
-  menu priority: 6
+  menu priority: 7
 
   permit_params :player_id, :draft_weapon_id
 

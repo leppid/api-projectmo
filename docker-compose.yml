@@ -62,6 +62,21 @@ services:
       - mo_network
     volumes:
       - ./direct_servers:/direct_servers
+  battle:
+    container_name: mo_battle
+    build:
+      context: .
+      dockerfile: docker/development/Dockerfile.battle
+    env_file:
+      - .env
+    ports:
+      - "9003:9003"
+    depends_on:
+      - session
+    networks:
+      - mo_network
+    volumes:
+      - ./direct_servers:/direct_servers
 networks:
   mo_network:
    name: 'mo_network'

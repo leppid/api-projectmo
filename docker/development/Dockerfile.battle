@@ -1,0 +1,16 @@
+FROM ruby:3.2.3
+
+WORKDIR /direct_servers
+
+RUN apt-get update -qq && \
+    apt-get upgrade -y
+
+RUN gem install msgpack
+RUN gem install redis
+RUN gem install oj
+
+COPY ./direct_servers .
+
+WORKDIR /direct_servers/battle
+
+CMD [ "ruby", "server.rb" ]

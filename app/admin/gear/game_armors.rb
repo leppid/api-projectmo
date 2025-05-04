@@ -1,5 +1,5 @@
 ActiveAdmin.register Game::Armor::Base, as: "Game Armors" do
-  menu priority: 5
+  menu priority: 6
 
   permit_params :player_id, :draft_armor_id
 

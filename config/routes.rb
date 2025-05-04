@@ -10,8 +10,9 @@ Rails.application.routes.draw do
   resources :session, only: [:index, :create]
   
   get "player", to: "player#index"
-  get "player/inventory", to: "player#inventory"
   post "player/sync", to: "player#sync"
+  post "battle/create", to: "battle#create"
+  post "battle/join", to: "battle#join"
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

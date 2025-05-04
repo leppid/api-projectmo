@@ -1,5 +1,5 @@
 ActiveAdmin.register Draft::Item::Base, as: "Draft Items" do
-  menu priority: 4
+  menu priority: 5
 
   permit_params :name, :type, :player_id
 

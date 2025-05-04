@@ -473,6 +473,7 @@ DEPENDENCIES
   jbuilder
   jwt (~> 2.5)
   kamal (>= 2.0.0.rc2)
+  msgpack
   pg
   propshaft
   pry
