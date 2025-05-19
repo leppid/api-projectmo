@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   resources :session, only: [:index, :create]
+  post "session/auth", to: "session#auth"
   
   get "player", to: "player#index"
   post "player/sync", to: "player#sync"

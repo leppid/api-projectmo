@@ -28,7 +28,7 @@ class Player < ApplicationRecord
 
   before_create :set_initial_data
 
-  after_create :create_equip_slots, :create_bag_slots, :create_bag_page
+  # after_create :create_equip_slots, :create_bag_slots, :create_bag_page
 
   def inventory
     armors + weapons + items
@@ -62,17 +62,17 @@ class Player < ApplicationRecord
 
   def self.test(login)
     exists = find_by(login: login)
-    test_player = exists || create(login: login, password: 'password')
-    unless exists
-      test_player.create_bag_page(2)
-      Draft::Armor::Base.where(test: true).each do |armor|
-        armor.spawn_for(test_player)
-      end
-      Draft::Weapon::Base.where(test: true).each do |weapon|
-        weapon.spawn_for(test_player)
-      end
-      test_player.inventory_without_slot.each(&:set_bag_slot)
-    end
+    test_player = exists || create(login: login, password: 'password') # rubocop:disable Style/RedundantAssignment
+    # unless exists
+    #   test_player.create_bag_page(2)
+    #   Draft::Armor::Base.where(test: true).each do |armor|
+    #     armor.spawn_for(test_player)
+    #   end
+    #   Draft::Weapon::Base.where(test: true).each do |weapon|
+    #     weapon.spawn_for(test_player)
+    #   end
+    #   test_player.inventory_without_slot.each(&:set_bag_slot)
+    # end
     test_player
   end
 

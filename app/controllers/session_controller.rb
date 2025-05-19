@@ -16,4 +16,12 @@ class SessionController < ApplicationController
       render json: { message: 'Invalid login or password' }, status: :unauthorized
     end
   end
+
+  def auth
+    return render json: { message: 'Session expired' }, status: :unauthorized unless current_player
+
+    current_player.update(auth_token: params[:authToken])
+
+    render json: SyncBlueprint.render_as_json(current_player), status: :ok
+  end
 end

@@ -32,51 +32,51 @@ services:
       - ./:/api
     tty: true
     stdin_open: true
-  session:
-    container_name: mo_session
-    build:
-      context: .
-      dockerfile: docker/development/Dockerfile.session
-    env_file:
-      - .env
-    ports:
-      - "9001:9001"
-    depends_on:
-      - api
-    networks:
-      - mo_network
-    volumes:
-      - ./direct_servers:/direct_servers
-  movement:
-    container_name: mo_movement
-    build:
-      context: .
-      dockerfile: docker/development/Dockerfile.movement
-    env_file:
-      - .env
-    ports:
-      - "9002:9002"
-    depends_on:
-      - session
-    networks:
-      - mo_network
-    volumes:
-      - ./direct_servers:/direct_servers
-  battle:
-    container_name: mo_battle
-    build:
-      context: .
-      dockerfile: docker/development/Dockerfile.battle
-    env_file:
-      - .env
-    ports:
-      - "9003:9003"
-    depends_on:
-      - session
-    networks:
-      - mo_network
-    volumes:
-      - ./direct_servers:/direct_servers
+  # session:
+  #   container_name: mo_session
+  #   build:
+  #     context: .
+  #     dockerfile: docker/development/Dockerfile.session
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "9001:9001"
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - mo_network
+  #   volumes:
+  #     - ./direct_servers:/direct_servers
+  # movement:
+  #   container_name: mo_movement
+  #   build:
+  #     context: .
+  #     dockerfile: docker/development/Dockerfile.movement
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "9002:9002"
+  #   depends_on:
+  #     - session
+  #   networks:
+  #     - mo_network
+  #   volumes:
+  #     - ./direct_servers:/direct_servers
+  # battle:
+  #   container_name: mo_battle
+  #   build:
+  #     context: .
+  #     dockerfile: docker/development/Dockerfile.battle
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "9003:9003"
+  #   depends_on:
+  #     - session
+  #   networks:
+  #     - mo_network
+  #   volumes:
+  #     - ./direct_servers:/direct_servers
 networks:
   mo_network:
    name: 'mo_network'

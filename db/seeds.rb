@@ -32,7 +32,10 @@ Draft::Weapon::Primary.find_or_create_by!(name: 'Club 2', model: "club2", test: 
 
 Player.test("lepple")
 Player.test("raven")
-Player.test("natafive")
+Player.test("azik")
+Player.test("zahar")
+Player.test("pendalf")
+Player.test("nata")
 
 Enemy.find_or_create_by!(name: 'Wolf', model: "wolf", min_damage: 10, max_damage: 20, crit_multiplier: 2, crit_chance: 20)
 
