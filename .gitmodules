@@ -1,0 +1,3 @@
+[submodule "stdb-projectmo"]
+	path = spacetime
+	url = https://github.com/leppid/stdb-projectmo
